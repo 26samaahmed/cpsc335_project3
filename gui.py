@@ -4,6 +4,27 @@ import tasks
 from tasks import add_task        # ← updated signature
 
 def submit_task():
+    # Check if all required fields are filled
+    if not task_name_entry.get():
+        messagebox.showwarning("Warning", "Please enter a task name.")
+        return False
+    if start_location_var.get() == "Select Location":
+        messagebox.showwarning("Warning", "Please select a start location.")
+        return False
+    if end_location_var.get() == "Select Location":
+        messagebox.showwarning("Warning", "Please select an end location.")
+        return False
+    if start_time_var.get() == "Select Time":
+        messagebox.showwarning("Warning", "Please select a start time.")
+        return False
+    if end_time_var.get() == "Select Time":
+        messagebox.showwarning("Warning", "Please select an end time.")
+        return False
+    else: # pop a success message
+        messagebox.showinfo("Success", "Task submitted successfully!")
+    
+    # TODO: Check end time comes after start time
+    
     name   = task_name_entry.get()
     startL = start_location_var.get()
     endL   = end_location_var.get()
@@ -17,7 +38,7 @@ def submit_task():
         conflict_names = ", ".join(c["name"] for c in result["conflicts"])
         if messagebox.askyesno(
             "Task Overlap",
-            f"New task overlaps with: {conflict_names}.\nReplace them?"
+            f"New task overlaps with {conflict_names}.\nReplace them?"
         ):
             # user accepted—re‑commit with replace=True
             result = add_task(name, startL, endL, startT, endT, replace=True)
