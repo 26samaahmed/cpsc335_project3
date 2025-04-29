@@ -1,20 +1,45 @@
 from tkinter import *
-from tkinter import PhotoImage
-
+from tkinter import PhotoImage, messagebox
+import tasks
+from tasks import add_task        # ← updated signature
 
 def submit_task():
-    task_name = task_name_entry.get()
-    start_location = start_location_var.get()
-    end_location = end_location_var.get()
-    start_time = start_time_var.get()
-    end_time = end_time_var.get()
+    name   = task_name_entry.get()
+    startL = start_location_var.get()
+    endL   = end_location_var.get()
+    startT = start_time_var.get()
+    endT   = end_time_var.get()
 
+    # delegate to tasks.py
+    result = add_task(name, startL, endL, startT, endT)
+    if result["conflicts"]:
+        # list the names of conflicting tasks
+        conflict_names = ", ".join(c["name"] for c in result["conflicts"])
+        if messagebox.askyesno(
+            "Task Overlap",
+            f"New task overlaps with: {conflict_names}.\nReplace them?"
+        ):
+            # user accepted—re‑commit with replace=True
+            result = add_task(name, startL, endL, startT, endT, replace=True)
+            sorted_tasks = result["scheduled"]
+        else:
+            # user declined—keep old schedule
+            sorted_tasks = tasks.tasks
+    else:
+        sorted_tasks = result["scheduled"]
+
+    # redraw the task list from sorted_tasks
     task_list.config(state="normal")
-    task_list.insert("end", task_name, "bold")
-    task_list.insert("end", f" | {start_location} ➔ {end_location} | {start_time} - {end_time}\n")
+    task_list.delete("1.0", END)
+    for task in sorted_tasks:
+        task_list.insert("end", task["name"], "bold")
+        task_list.insert("end",
+            f" | {task['start_location']} ➔ {task['end_location']} | "
+            f"{task['start_time']} - {task['end_time']}\n"
+        )
     task_list.config(state="disabled")
 
-    # Clear the input fields after submission
+    # clear inputs…
     task_name_entry.delete(0, END)
     task_desc_entry.delete(0, END)
     room_number_entry.delete(0, END)
