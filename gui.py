@@ -133,3 +133,7 @@ map_label.pack(side="left", padx=20, pady=20, anchor="n")
 
 
 root.mainloop()
+
+# TODO: Check if all required filled have been filled
+# TODO: Check that end time is after start time, and give a warning if not
+# TODO: Reformat the way the task is displayed to have the title on a line and then seperate the rest of the information on another line
