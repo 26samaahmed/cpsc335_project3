@@ -1,16 +1,29 @@
 from tkinter import *
 from tkinter import PhotoImage
 
-# --- Add a button to submit the task ---
+
 def submit_task():
     task_name = task_name_entry.get()
-    task_desc = task_desc_entry.get()
     start_location = start_location_var.get()
     end_location = end_location_var.get()
-    room_number = room_number_entry.get()
     start_time = start_time_var.get()
     end_time = end_time_var.get()
-    # TODO: return the task name, start location, end location, room number, start time, and end time to display in the task list
+
+    task_list.config(state="normal")
+    task_list.insert("end", task_name, "bold")
+    task_list.insert("end", f" | {start_location} ➔ {end_location} | {start_time} - {end_time}\n")
+    task_list.config(state="disabled")
+
+    # Clear the input fields after submission
+    task_name_entry.delete(0, END)
+    task_desc_entry.delete(0, END)
+    room_number_entry.delete(0, END)
+    room_number_entry2.delete(0, END)
+    start_location_var.set("Select Location")
+    end_location_var.set("Select Location")
+    start_time_var.set("Select Time")
+    end_time_var.set("Select Time")
+
 
 # Main Window
 root = Tk()
@@ -34,7 +47,7 @@ main_frame.pack(pady=10, fill="both", expand=True)
 main_frame.pack_propagate(False)
 
 # Task form inside main_frame
-Label(main_frame, text="Task Name", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=1, column=0, padx=10, pady=10, sticky="w")
+Label(main_frame, text="Task Name*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=1, column=0, padx=10, pady=10, sticky="w")
 task_name_entry = Entry(main_frame, width=30)
 task_name_entry.grid(row=1, column=1, padx=10, pady=10)
 
@@ -42,7 +55,7 @@ Label(main_frame, text="Task Description (optional)", font=("Courier New", 14), 
 task_desc_entry = Entry(main_frame, width=30)
 task_desc_entry.grid(row=2, column=1, padx=10, pady=10)
 
-Label(main_frame, text="Start Location", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=3, column=0, padx=10, pady=10, sticky="w")
+Label(main_frame, text="Start Location*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=3, column=0, padx=10, pady=10, sticky="w")
 start_location_var = StringVar(value="Select Location")
 start_location_dropdown = OptionMenu(main_frame, start_location_var, 
     "College Park", "Pollak Library", "Engineering Building", "Humanities Building", 
@@ -57,7 +70,7 @@ Label(main_frame, text="Room Number (optional)", font=("Courier New", 14), bg='#
 room_number_entry = Entry(main_frame, width=30)
 room_number_entry.grid(row=4, column=1, padx=10, pady=10)
 
-Label(main_frame, text="End Location", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=5, column=0, padx=10, pady=10, sticky="w")
+Label(main_frame, text="End Location*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=5, column=0, padx=10, pady=10, sticky="w")
 end_location_var = StringVar(value="Select Location")
 end_location_dropdown = OptionMenu(main_frame, end_location_var, 
     "College Park", "Pollak Library", "Engineering Building", "Humanities Building", 
@@ -68,7 +81,11 @@ end_location_dropdown = OptionMenu(main_frame, end_location_var,
 end_location_dropdown.config(width=27)
 end_location_dropdown.grid(row=5, column=1, padx=10, pady=10)
 
-Label(main_frame, text="Start Time", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=6, column=0, padx=10, pady=10, sticky="w")
+Label(main_frame, text="Room Number (optional)", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=6, column=0, padx=10, pady=10, sticky="w")
+room_number_entry2 = Entry(main_frame, width=30)
+room_number_entry2.grid(row=6, column=1, padx=10, pady=10)
+
+Label(main_frame, text="Start Time*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=7, column=0, padx=10, pady=10, sticky="w")
 start_time_var = StringVar(value="Select Time")
 start_time_dropdown = OptionMenu(main_frame, start_time_var, 
     "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
@@ -77,9 +94,9 @@ start_time_dropdown = OptionMenu(main_frame, start_time_var,
     "11:00 PM", "12:00 AM", "01:00 AM", "02:00 AM", "03:00 AM",
     "04:00 AM", "05:00 AM", "06:00 AM", "07:00 AM")
 start_time_dropdown.config(width=27)
-start_time_dropdown.grid(row=6, column=1, padx=10, pady=10)
+start_time_dropdown.grid(row=7, column=1, padx=10, pady=10)
 
-Label(main_frame, text="End Time", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=7, column=0, padx=10, pady=10, sticky="w")
+Label(main_frame, text="End Time*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=8, column=0, padx=10, pady=10, sticky="w")
 end_time_var = StringVar(value="Select Time")
 end_time_dropdown = OptionMenu(main_frame, end_time_var, 
     "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
@@ -88,26 +105,31 @@ end_time_dropdown = OptionMenu(main_frame, end_time_var,
     "11:00 PM", "12:00 AM", "01:00 AM", "02:00 AM", "03:00 AM",
     "04:00 AM", "05:00 AM", "06:00 AM", "07:00 AM")
 end_time_dropdown.config(width=27)
-end_time_dropdown.grid(row=7, column=1, padx=10, pady=10)
+end_time_dropdown.grid(row=8, column=1, padx=10, pady=10)
 
 submit_button = Button(main_frame, text="Submit Task", font=("Courier New", 14), command=submit_task)
-submit_button.grid(row=8, column=0, columnspan=2, pady=20)
-# TODO: On submit, we should add a mini frame inside of task list that displays the task name, location + time frame
+submit_button.grid(row=9, column=0, columnspan=2, pady=20)
 
 task_frame = Frame(left_frame, bg='#4E4E4E', borderwidth=5, relief="raised", height=300, width=400)
 task_frame.pack(pady=10, fill="both", expand=True)
 task_frame.pack_propagate(False)
 
-task_list_label = Label(task_frame, text="Your Tasks", font=("Courier New", 20, "bold"), fg="white", bg='#4E4E4E', pady=10)
-task_list_label.pack()
-task_list = Listbox(task_frame, width=60, height=10)
-task_list.pack(pady=10)
+#task_list_label = Label(task_frame, text="Your Tasks", font=("Courier New", 20, "bold"), fg="white", bg='#4E4E4E', pady=10)
+#task_list_label.pack()
+#task_list = Listbox(task_frame, width=60, height=10, font=("Courier New", 14), bg='#4E4E4E', border=0, fg="white")
+#task_list.pack(pady=10)
 
+task_list_label = Label(task_frame, text="Your Tasks", font=("Courier New", 20, "bold"), fg="white", bg="#4E4E4E", pady=10)
+task_list_label.pack()
+
+task_list = Text(task_frame, width=60, height=10, font=("Courier New", 14), bg="#4E4E4E", fg="white", wrap="word", border=0, bd=0, highlightthickness=0)
+task_list.tag_configure("bold", font=("Courier New", 14, "bold"))
+task_list.pack(pady=10)
+task_list.config(state="disabled")
 
 map_image = PhotoImage(file="csuf_map.png")
 map_label = Label(content_frame, image=map_image, bg='#C3C3C3')
 map_label.pack(side="left", padx=20, pady=20, anchor="n")
-
 
 
 root.mainloop()
