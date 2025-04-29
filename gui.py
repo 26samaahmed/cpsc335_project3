@@ -20,16 +20,17 @@ def submit_task():
     if end_time_var.get() == "Select Time":
         messagebox.showwarning("Warning", "Please select an end time.")
         return False
-    else: # pop a success message
-        messagebox.showinfo("Success", "Task submitted successfully!")
-    
-    # TODO: Check end time comes after start time
-    
+
     name   = task_name_entry.get()
     startL = start_location_var.get()
     endL   = end_location_var.get()
     startT = start_time_var.get()
     endT   = end_time_var.get()
+
+    if endT <= startT: # TODO: Add a check for pm vs am
+        messagebox.showwarning("Warning", "End time must be after start time.")
+        end_time_var.set("Select Time")
+        return False
 
     # delegate to tasks.py
     result = add_task(name, startL, endL, startT, endT)
@@ -49,6 +50,8 @@ def submit_task():
     else:
         sorted_tasks = result["scheduled"]
 
+
+    messagebox.showinfo("Success", "Task submitted successfully!")
     # redraw the task list from sorted_tasks
     task_list.config(state="normal")
     task_list.delete("1.0", END)
