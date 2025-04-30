@@ -59,17 +59,17 @@ def draw_map(start, end):
         else:
             edge_colors.append('black')
 
-    
-    nx.draw_networkx(G, pos, labels=labels, edge_color=edge_colors, **options)
+    fig, ax = plt.subplots(figsize=(6, 4))
+    nx.draw_networkx(G, pos, labels=labels, edge_color=edge_colors, ax=ax, **options)
 
     edges_lables = nx.get_edge_attributes(G, 'weight')
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edges_lables)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edges_lables, ax=ax)
 
     # Set margins for the axes so that nodes aren't clipped
-    ax = plt.gca()
+    ax.set_axis_off()
     ax.margins(0.20)
-    plt.axis("off")
-    plt.show()
+
+    return fig
 
 def dijkstra(graph, start, end):
     dist = {}
@@ -105,4 +105,4 @@ def dijkstra(graph, start, end):
     return path, dist[end]
 
 
-draw_map(Buildings.ECS, Buildings.KHS)
+

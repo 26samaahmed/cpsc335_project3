@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter import PhotoImage, messagebox
 import tasks
 from tasks import add_task        # ← updated signature
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import map
 
 def submit_task():
     # Check if all required fields are filled
@@ -176,10 +178,19 @@ task_list.tag_configure("bold", font=("Courier New", 14, "bold"))
 task_list.pack(pady=10)
 task_list.config(state="disabled")
 
-map_image = PhotoImage(file="csuf_map.png")
-map_label = Label(content_frame, image=map_image, bg='#C3C3C3')
-map_label.pack(side="left", padx=20, pady=20, anchor="n")
+# map_image = PhotoImage(file="csuf_map.png")
+# map_label = Label(content_frame, image=map_image, bg='#C3C3C3')
+# map_label.pack(side="left", padx=20, pady=20, anchor="n")
 
+
+# Right side: Map
+right_frame = Frame(content_frame, bg='#C0D9F0')
+right_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20, anchor="n")
+
+graph = map.draw_map(map.Buildings.ECS, map.Buildings.KHS) # Create graph of Buildings with shortest path between two points
+canvas = FigureCanvasTkAgg(graph, master=right_frame)
+canvas.draw()
+canvas.get_tk_widget().pack(fill="both", expand=True)
 
 root.mainloop()
 
