@@ -10,7 +10,19 @@ class Buildings(Enum):
     TSU = 4
     KHS = 5
 
+string_to_enum = {
+    "Engineering Building": Buildings.ECS,
+    "Computer Science Building": Buildings.ECS,
+    "McCarthy Hall": Buildings.MH,
+    "Steven G. Mihaylo Hall": Buildings.SGMH,
+    "Titan Student Union": Buildings.TSU,
+    "Kinesiology and Health Science Building": Buildings.KHS
+}
+
 def draw_map(start, end):
+    start = string_to_enum[start]
+    end = string_to_enum[end]
+
     G = nx.Graph()
 
     G.add_edge(Buildings.ECS.value, Buildings.SGMH.value, weight=10)

@@ -5,6 +5,16 @@ from tasks import add_task        # ← updated signature
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import map
 
+def update_map(startL, endL):
+    # Right side: Map
+    right_frame = Frame(content_frame, bg='#C0D9F0')
+    right_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20, anchor="n")
+
+    graph = map.draw_map(startL, endL) # Create graph of Buildings with shortest path between two points
+    canvas = FigureCanvasTkAgg(graph, master=right_frame)
+    canvas.draw()
+    canvas.get_tk_widget().pack(fill="both", expand=True)
+
 def submit_task():
     # Check if all required fields are filled
     if not task_name_entry.get():
@@ -33,6 +43,8 @@ def submit_task():
         messagebox.showwarning("Warning", "End time must be after start time.")
         end_time_var.set("Select Time")
         return False
+
+    update_map(startL, endL)
 
     # delegate to tasks.py
     result = add_task(name, startL, endL, startT, endT)
@@ -181,16 +193,6 @@ task_list.config(state="disabled")
 # map_image = PhotoImage(file="csuf_map.png")
 # map_label = Label(content_frame, image=map_image, bg='#C3C3C3')
 # map_label.pack(side="left", padx=20, pady=20, anchor="n")
-
-
-# Right side: Map
-right_frame = Frame(content_frame, bg='#C0D9F0')
-right_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20, anchor="n")
-
-graph = map.draw_map(map.Buildings.ECS, map.Buildings.TSU) # Create graph of Buildings with shortest path between two points
-canvas = FigureCanvasTkAgg(graph, master=right_frame)
-canvas.draw()
-canvas.get_tk_widget().pack(fill="both", expand=True)
 
 root.mainloop()
 
