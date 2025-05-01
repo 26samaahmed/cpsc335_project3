@@ -187,7 +187,7 @@ task_list.config(state="disabled")
 right_frame = Frame(content_frame, bg='#C0D9F0')
 right_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20, anchor="n")
 
-graph = map.draw_map(map.Buildings.ECS, map.Buildings.KHS) # Create graph of Buildings with shortest path between two points
+graph = map.draw_map(map.Buildings.ECS, map.Buildings.TSU) # Create graph of Buildings with shortest path between two points
 canvas = FigureCanvasTkAgg(graph, master=right_frame)
 canvas.draw()
 canvas.get_tk_widget().pack(fill="both", expand=True)

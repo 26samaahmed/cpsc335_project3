@@ -48,14 +48,20 @@ def draw_map(start, end):
         5: "KHS"
     }
     
-    path, total_distance = dijkstra(G, start.value, end.value)
-
+    path = dijkstra(G, start.value, end.value)
     path_edges = list(zip(path, path[1:]))
+
+    mst = prim(G, len(Buildings))
+    mst_edges = []
+    for u, v, _ in mst:
+        mst_edges.append((u, v))
 
     edge_colors = []
     for u, v in G.edges():
         if (u, v) in path_edges or (v, u) in path_edges:
             edge_colors.append('red')
+        elif (u, v) in mst_edges or (v, u) in edge_colors:
+            edge_colors.append('blue')
         else:
             edge_colors.append('black')
 
@@ -102,7 +108,25 @@ def dijkstra(graph, start, end):
         node = prev[node]
     
     path.reverse()
-    return path, dist[end]
+    return path
 
+def prim(graph, n):
+    visited = [False] * (n + 1)
+    min_heap = [(0, 1, -1)]
+    mst_edges = []
 
+    while min_heap:
+        cost, u, parent = heapq.heappop(min_heap)
+        if visited[u]:
+            continue
+        visited[u] = True
 
+        if parent != -1:
+            mst_edges.append((parent, u, cost))
+
+        for v in graph.neighbors(u):
+            weight = graph[u][v]['weight']
+            if not visited[v]:
+                heapq.heappush(min_heap, (weight, v, u))
+
+    return mst_edges
