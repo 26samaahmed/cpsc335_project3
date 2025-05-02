@@ -9,6 +9,9 @@ class Buildings(Enum):
     MH = 3
     TSU = 4
     KHS = 5
+    PL = 6
+    VA = 7
+    H = 8
 
 string_to_enum = {
     "Engineering Building": Buildings.ECS,
@@ -16,7 +19,10 @@ string_to_enum = {
     "McCarthy Hall": Buildings.MH,
     "Steven G. Mihaylo Hall": Buildings.SGMH,
     "Titan Student Union": Buildings.TSU,
-    "Kinesiology and Health Science Building": Buildings.KHS
+    "Kinesiology and Health Science Building": Buildings.KHS,
+    "Pollak Library": Buildings.PL,
+    "Visual Arts Center": Buildings.VA,
+    "Humanities Building": Buildings.H
 }
 
 def draw_map(start, end):
@@ -25,7 +31,8 @@ def draw_map(start, end):
 
     G = nx.Graph()
 
-    G.add_edge(Buildings.ECS.value, Buildings.SGMH.value, weight=10)
+    G.add_edge(Buildings.H.value, Buildings.SGMH.value, weight=4)
+    G.add_edge(Buildings.H.value, Buildings.ECS.value, weight=5)
     G.add_edge(Buildings.ECS.value, Buildings.MH.value, weight=7)
     G.add_edge(Buildings.ECS.value, Buildings.KHS.value, weight=12)
     G.add_edge(Buildings.SGMH.value, Buildings.MH.value, weight=5)
@@ -33,14 +40,22 @@ def draw_map(start, end):
     G.add_edge(Buildings.TSU.value, Buildings.KHS.value, weight=6)
     G.add_edge(Buildings.SGMH.value, Buildings.TSU.value, weight=11)
     G.add_edge(Buildings.KHS.value, Buildings.MH.value, weight=4)
+    G.add_edge(Buildings.PL.value, Buildings.ECS.value, weight=2)
+    G.add_edge(Buildings.PL.value, Buildings.MH.value, weight=1)
+    G.add_edge(Buildings.PL.value, Buildings.KHS.value, weight=4)
+    G.add_edge(Buildings.VA.value, Buildings.TSU.value, weight=3)
+    G.add_edge(Buildings.VA.value, Buildings.SGMH.value, weight=6)
 
     # explicitly set positions
     pos = {
-        Buildings.ECS.value: (0, 0),
+        Buildings.ECS.value: (0, -0.03),
         Buildings.SGMH.value: (-1, 0.3),
         Buildings.MH.value: (2, 0.17),
+        Buildings.PL.value: (2, 0.03),
         Buildings.TSU.value: (4, 0.255),
-        Buildings.KHS.value: (5, 0.03)
+        Buildings.KHS.value: (5, 0),
+        Buildings.VA.value: (2, 0.32),
+        Buildings.H.value: (0.3, 0.16)
     }
 
     options = {
@@ -57,7 +72,10 @@ def draw_map(start, end):
         2: "SGMH",
         3: "MH",
         4: "TSU",
-        5: "KHS"
+        5: "KHS",
+        6: "PL",
+        7: "VA",
+        8: "H"
     }
     
     path = dijkstra(G, start.value, end.value)
