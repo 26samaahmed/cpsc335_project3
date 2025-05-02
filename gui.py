@@ -66,16 +66,30 @@ def submit_task():
 
 
     messagebox.showinfo("Success", "Task submitted successfully!")
-    # redraw the task list from sorted_tasks
-    task_list.config(state="normal")
-    task_list.delete("1.0", END)
-    for task in sorted_tasks:
-        task_list.insert("end", task["name"], "bold")
-        task_list.insert("end",
-            f" | {task['start_location']} ➔ {task['end_location']} | "
-            f"{task['start_time']} - {task['end_time']}\n"
-        )
-    task_list.config(state="disabled")
+
+    # Create New frame with the information
+    task_frame = Frame(left_frame, bg='#4E4E4E', borderwidth=5, height=100, width=400)
+    task_frame.pack(pady=10, fill="both", expand=True)
+    task_frame.pack_propagate(False)
+
+    task_name = Label(task_frame, text=name, font=("Courier New", 20, "bold"), fg="white", bg="#4E4E4E", justify="left")
+    task_name.pack(anchor="w", padx=10, pady=(10, 0))
+
+    info_row = Frame(task_frame, bg="#4E4E4E")
+    info_row.pack(fill="x", expand=True, padx=10, pady=(5, 10))
+
+    locations_label = Label(info_row, 
+        text=f"{startL} - {endL}", 
+        font=("Courier New", 14), 
+        fg="white", bg="#4E4E4E", anchor="w")
+    locations_label.pack(side="left", fill="x", expand=True)
+
+    time_label = Label(info_row, 
+        text=f"{startT} - {endT}", 
+        font=("Courier New", 14), 
+        fg="white", bg="#4E4E4E", anchor="e")
+    time_label.pack(side="right", fill="x")
+
 
     # clear inputs…
     task_name_entry.delete(0, END)
@@ -91,7 +105,7 @@ def submit_task():
 # Main Window
 root = Tk()
 root.title("Smart Campus Navigation and Task Scheduler")
-root.geometry('1300x800')
+root.geometry('1300x1300')
 root.configure(background='#C0D9F0')
 
 Label(root, text="Welcome to Path Visualizer 💫", font=("Courier New", 24, "bold"), fg="#002438", wraplength=500, justify="center", bg='#C0D9F0', pady=10).pack()
@@ -173,22 +187,20 @@ end_time_dropdown.grid(row=8, column=1, padx=10, pady=10)
 submit_button = Button(main_frame, text="Submit Task", font=("Courier New", 14), command=submit_task)
 submit_button.grid(row=9, column=0, columnspan=2, pady=20)
 
-task_frame = Frame(left_frame, bg='#4E4E4E', borderwidth=5, relief="raised", height=300, width=400)
-task_frame.pack(pady=10, fill="both", expand=True)
-task_frame.pack_propagate(False)
 
-#task_list_label = Label(task_frame, text="Your Tasks", font=("Courier New", 20, "bold"), fg="white", bg='#4E4E4E', pady=10)
+# Generate a new task frame everytime the user submits a task
+#task_frame = Frame(left_frame, bg='#4E4E4E', borderwidth=5, height=100, width=400)
+#task_frame.pack(pady=10, fill="both", expand=True)
+#task_frame.pack_propagate(False)
+
+
+#task_list_label = Label(task_frame, text="Your Tasks", font=("Courier New", 20, "bold"), fg="white", bg="#4E4E4E", pady=10)
 #task_list_label.pack()
-#task_list = Listbox(task_frame, width=60, height=10, font=("Courier New", 14), bg='#4E4E4E', border=0, fg="white")
+
+#task_list = Text(task_frame, width=60, height=10, font=("Courier New", 14), bg="#4E4E4E", fg="white", wrap="word", border=0, bd=0, highlightthickness=0)
+#task_list.tag_configure("bold", font=("Courier New", 14, "bold"))
 #task_list.pack(pady=10)
-
-task_list_label = Label(task_frame, text="Your Tasks", font=("Courier New", 20, "bold"), fg="white", bg="#4E4E4E", pady=10)
-task_list_label.pack()
-
-task_list = Text(task_frame, width=60, height=10, font=("Courier New", 14), bg="#4E4E4E", fg="white", wrap="word", border=0, bd=0, highlightthickness=0)
-task_list.tag_configure("bold", font=("Courier New", 14, "bold"))
-task_list.pack(pady=10)
-task_list.config(state="disabled")
+#task_list.config(state="disabled")
 
 # map_image = PhotoImage(file="csuf_map.png")
 # map_label = Label(content_frame, image=map_image, bg='#C3C3C3')
@@ -196,6 +208,4 @@ task_list.config(state="disabled")
 
 root.mainloop()
 
-# TODO: Check if all required filled have been filled
-# TODO: Check that end time is after start time, and give a warning if not
 # TODO: Reformat the way the task is displayed to have the title on a line and then seperate the rest of the information on another line
