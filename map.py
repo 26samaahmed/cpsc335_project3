@@ -14,8 +14,7 @@ class Buildings(Enum):
     H = 8
 
 string_to_enum = {
-    "Engineering Building": Buildings.ECS,
-    "Computer Science Building": Buildings.ECS,
+    "Engineering & Computer Science Building": Buildings.ECS,
     "McCarthy Hall": Buildings.MH,
     "Steven G. Mihaylo Hall": Buildings.SGMH,
     "Titan Student Union": Buildings.TSU,

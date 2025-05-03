@@ -26,23 +26,23 @@ def submit_task():
     if end_location_var.get() == "Select Location":
         messagebox.showwarning("Warning", "Please select an end location.")
         return False
-    if start_time_var.get() == "Select Time":
-        messagebox.showwarning("Warning", "Please select a start time.")
+    if start_time_var_hour.get() == "Hour" or start_time_var_minute.get() == "Minute" or start_am_vs_pm.get() == "AM or PM":
+        messagebox.showwarning("Warning", "Please fill all of the start time fields.")
         return False
-    if end_time_var.get() == "Select Time":
-        messagebox.showwarning("Warning", "Please select an end time.")
+    if end_time_var_hour.get() == "Hour" or end_time_var_minute.get() == "Minute" or end_am_vs_pm.get() == "AM or PM":
+        messagebox.showwarning("Warning", "Please fill all of the end time fields.")
         return False
 
     name   = task_name_entry.get()
     startL = start_location_var.get()
     endL   = end_location_var.get()
-    startT = start_time_var.get()
-    endT   = end_time_var.get()
+    startT = start_time_var_hour.get() + ":" + start_time_var_minute.get() + " " + start_am_vs_pm.get()
+    endT   = end_time_var_hour.get() + ":" + end_time_var_minute.get() + " " + end_am_vs_pm.get()
 
-    if endT <= startT: # TODO: Add a check for pm vs am
-        messagebox.showwarning("Warning", "End time must be after start time.")
-        end_time_var.set("Select Time")
-        return False
+    #if endT <= startT:
+       # messagebox.showwarning("Warning", "End time must be after start time.")
+       # end_time_var.set("Select Time")
+       # return False
 
     update_map(startL, endL)
 
@@ -98,8 +98,12 @@ def submit_task():
     room_number_entry2.delete(0, END)
     start_location_var.set("Select Location")
     end_location_var.set("Select Location")
-    start_time_var.set("Select Time")
-    end_time_var.set("Select Time")
+    start_time_var_hour.set("Hour")
+    start_time_var_minute.set("Minute")
+    end_time_var_hour.set("Hour")
+    end_time_var_minute.set("Minute")
+    start_am_vs_pm.set("AM or PM")
+    end_am_vs_pm.set("AM or PM")
 
 
 # Main Window
@@ -116,12 +120,12 @@ content_frame.pack(pady=20, padx=20, fill="both", expand=True)
 
 # Left side: Form + Tasks
 left_frame = Frame(content_frame, bg='#C0D9F0')
-left_frame.pack(side="left", padx=20, pady=20, anchor="n")
+left_frame.pack(side="left", padx=10, pady=10, anchor="n")
 
 # Main frame (Form) inside left_frame
 main_frame = Frame(left_frame, bg='#4E4E4E', borderwidth=5, relief="raised", height=400, width=400)
 main_frame.pack(pady=10, fill="both", expand=True)
-main_frame.pack_propagate(False)
+
 
 # Task form inside main_frame
 Label(main_frame, text="Task Name*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=1, column=0, padx=10, pady=10, sticky="w")
@@ -135,11 +139,7 @@ task_desc_entry.grid(row=2, column=1, padx=10, pady=10)
 Label(main_frame, text="Start Location*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=3, column=0, padx=10, pady=10, sticky="w")
 start_location_var = StringVar(value="Select Location")
 start_location_dropdown = OptionMenu(main_frame, start_location_var, 
-    "College Park", "Pollak Library", "Engineering Building", "Humanities Building", 
-    "Computer Science Building", "Visual Arts Center", "Steven G. Mihaylo Hall", 
-    "McCarthy Hall", "University Hall", "Titan Student Union", 
-    "Kinesiology and Health Science Building", "Langsdorf Hall", 
-    "Gordon Hall", "Dan Black Hall")
+    "Engineering & Computer Science Building", "McCarthy Hall", "Steven G. Mihaylo Hall", "Titan Student Union", "Kinesiology and Health Science Building", "Pollak Library", "Visual Arts Center", "Humanities Building")
 start_location_dropdown.config(width=27)
 start_location_dropdown.grid(row=3, column=1, padx=10, pady=10)
 
@@ -150,11 +150,7 @@ room_number_entry.grid(row=4, column=1, padx=10, pady=10)
 Label(main_frame, text="End Location*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=5, column=0, padx=10, pady=10, sticky="w")
 end_location_var = StringVar(value="Select Location")
 end_location_dropdown = OptionMenu(main_frame, end_location_var, 
-    "College Park", "Pollak Library", "Engineering Building", "Humanities Building", 
-    "Computer Science Building", "Visual Arts Center", "Steven G. Mihaylo Hall", 
-    "McCarthy Hall", "University Hall", "Titan Student Union", 
-    "Kinesiology and Health Science Building", "Langsdorf Hall", 
-    "Gordon Hall", "Dan Black Hall")
+    "Engineering & Computer Science Building", "McCarthy Hall", "Steven G. Mihaylo Hall", "Titan Student Union", "Kinesiology and Health Science Building", "Pollak Library", "Visual Arts Center", "Humanities Building")
 end_location_dropdown.config(width=27)
 end_location_dropdown.grid(row=5, column=1, padx=10, pady=10)
 
@@ -162,45 +158,48 @@ Label(main_frame, text="Room Number (optional)", font=("Courier New", 14), bg='#
 room_number_entry2 = Entry(main_frame, width=30)
 room_number_entry2.grid(row=6, column=1, padx=10, pady=10)
 
-Label(main_frame, text="Start Time*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=7, column=0, padx=10, pady=10, sticky="w")
-start_time_var = StringVar(value="Select Time")
-start_time_dropdown = OptionMenu(main_frame, start_time_var, 
-    "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
-    "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM",
-    "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM", "10:00 PM",
-    "11:00 PM", "12:00 AM", "01:00 AM", "02:00 AM", "03:00 AM",
-    "04:00 AM", "05:00 AM", "06:00 AM", "07:00 AM")
-start_time_dropdown.config(width=27)
-start_time_dropdown.grid(row=7, column=1, padx=10, pady=10)
+Label(main_frame, text="Start Time*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w")\
+    .grid(row=7, column=0, padx=10, pady=10, sticky="w")
 
-Label(main_frame, text="End Time*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w").grid(row=8, column=0, padx=10, pady=10, sticky="w")
-end_time_var = StringVar(value="Select Time")
-end_time_dropdown = OptionMenu(main_frame, end_time_var, 
-    "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
-    "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM",
-    "06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM", "10:00 PM",
-    "11:00 PM", "12:00 AM", "01:00 AM", "02:00 AM", "03:00 AM",
-    "04:00 AM", "05:00 AM", "06:00 AM", "07:00 AM")
-end_time_dropdown.config(width=27)
-end_time_dropdown.grid(row=8, column=1, padx=10, pady=10)
+start_time_var_hour = StringVar(value="Hour")
+start_hour_dropdown = OptionMenu(main_frame, start_time_var_hour, 
+    "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")
+start_hour_dropdown.config(width=4)
+start_hour_dropdown.grid(row=7, column=1)
+
+start_time_var_minute = StringVar(value="Minute")
+start_minute_dropdown = OptionMenu(main_frame, start_time_var_minute, "00", "15", "30", "45")
+start_minute_dropdown.config(width=4)
+start_minute_dropdown.grid(row=7, column=2, padx=5, pady=10)
+
+start_am_vs_pm = StringVar(value="AM or PM")
+start_am_vs_pm_dropdown = OptionMenu(main_frame, start_am_vs_pm, "AM", "PM")
+start_am_vs_pm_dropdown.config(width=6)
+start_am_vs_pm_dropdown.grid(row=7, column=3)
+
+
+Label(main_frame, text="End Time*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w")\
+    .grid(row=8, column=0, padx=10, pady=10, sticky="w")
+
+end_time_var_hour = StringVar(value="Hour")
+end_hour_dropdown = OptionMenu(main_frame, end_time_var_hour, 
+    "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")
+end_hour_dropdown.config(width=4)
+end_hour_dropdown.grid(row=8, column=1)
+
+end_time_var_minute = StringVar(value="Minute")
+end_minute_dropdown = OptionMenu(main_frame, end_time_var_minute, "00", "15", "30", "45")
+end_minute_dropdown.config(width=4)
+end_minute_dropdown.grid(row=8, column=2)
+
+end_am_vs_pm = StringVar(value="AM or PM")
+end_am_vs_pm_dropdown = OptionMenu(main_frame, end_am_vs_pm, "AM", "PM")
+end_am_vs_pm_dropdown.config(width=6)
+end_am_vs_pm_dropdown.grid(row=8, column=3)
+
 
 submit_button = Button(main_frame, text="Submit Task", font=("Courier New", 14), command=submit_task)
 submit_button.grid(row=9, column=0, columnspan=2, pady=20)
-
-
-# Generate a new task frame everytime the user submits a task
-#task_frame = Frame(left_frame, bg='#4E4E4E', borderwidth=5, height=100, width=400)
-#task_frame.pack(pady=10, fill="both", expand=True)
-#task_frame.pack_propagate(False)
-
-
-#task_list_label = Label(task_frame, text="Your Tasks", font=("Courier New", 20, "bold"), fg="white", bg="#4E4E4E", pady=10)
-#task_list_label.pack()
-
-#task_list = Text(task_frame, width=60, height=10, font=("Courier New", 14), bg="#4E4E4E", fg="white", wrap="word", border=0, bd=0, highlightthickness=0)
-#task_list.tag_configure("bold", font=("Courier New", 14, "bold"))
-#task_list.pack(pady=10)
-#task_list.config(state="disabled")
 
 # map_image = PhotoImage(file="csuf_map.png")
 # map_label = Label(content_frame, image=map_image, bg='#C3C3C3')
@@ -209,3 +208,5 @@ submit_button.grid(row=9, column=0, columnspan=2, pady=20)
 root.mainloop()
 
 # TODO: Reformat the way the task is displayed to have the title on a line and then seperate the rest of the information on another line
+# TODO: Fix ovelap
+# TODO: Check if the start time is before the end time
