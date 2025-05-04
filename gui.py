@@ -6,10 +6,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import csuf_map
 
 def update_map(startL, endL):
-    # Right side: Map
-    right_frame = Frame(content_frame, bg='#C0D9F0')
-    right_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20, anchor="n")
+    # Delete previous map
+    for widget in right_frame.winfo_children():
+        widget.destroy()
 
+    # Create new map with the new start and end points
     graph = csuf_map.draw_map(startL, endL) # Create graph of Buildings with shortest path between two points
     canvas = FigureCanvasTkAgg(graph, master=right_frame)
     canvas.draw()
@@ -230,6 +231,15 @@ submit_button.grid(row=9, column=0, columnspan=2, pady=20)
 # map_image = PhotoImage(file="csuf_map.png")
 # map_label = Label(content_frame, image=map_image, bg='#C3C3C3')
 # map_label.pack(side="left", padx=20, pady=20, anchor="n")
+
+# Right side: Map (Show empty map before paths are created)
+right_frame = Frame(content_frame, bg='#C0D9F0')
+right_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20, anchor="n")
+
+graph = csuf_map.draw_map() # Create graph of Buildings with shortest path between two points
+canvas = FigureCanvasTkAgg(graph, master=right_frame)
+canvas.draw()
+canvas.get_tk_widget().pack(fill="both", expand=True)
 
 root.mainloop()
 

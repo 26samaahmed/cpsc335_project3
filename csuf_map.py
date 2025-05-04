@@ -24,9 +24,10 @@ string_to_enum = {
     "Humanities Building": Buildings.H
 }
 
-def draw_map(start, end):
-    start = string_to_enum[start]
-    end = string_to_enum[end]
+def draw_map(start="", end=""):
+    if start != "":
+        start = string_to_enum[start]
+        end = string_to_enum[end]
 
     G = nx.Graph()
 
@@ -77,25 +78,30 @@ def draw_map(start, end):
         8: "H"
     }
     
-    path = dijkstra(G, start.value, end.value)
-    path_edges = list(zip(path, path[1:]))
+    if start != "":
+        path = dijkstra(G, start.value, end.value)
+        path_edges = list(zip(path, path[1:]))
 
     mst = prim(G, len(Buildings))
     mst_edges = []
     for u, v, _ in mst:
         mst_edges.append((u, v))
 
-    edge_colors = []
-    for u, v in G.edges():
-        if (u, v) in path_edges or (v, u) in path_edges:
-            edge_colors.append('red')
-        elif (u, v) in mst_edges or (v, u) in edge_colors:
-            edge_colors.append('blue')
-        else:
-            edge_colors.append('black')
+    if start != "":
+        edge_colors = []
+        for u, v in G.edges():
+            if (u, v) in path_edges or (v, u) in path_edges:
+                edge_colors.append('red')
+            elif (u, v) in mst_edges or (v, u) in mst_edges:
+                edge_colors.append('blue')
+            else:
+                edge_colors.append('black')
 
     fig, ax = plt.subplots(figsize=(6, 4))
-    nx.draw_networkx(G, pos, labels=labels, edge_color=edge_colors, ax=ax, **options)
+    if start != "":
+        nx.draw_networkx(G, pos, labels=labels, edge_color=edge_colors, ax=ax, **options)
+    else:
+        nx.draw_networkx(G, pos, labels=labels, ax=ax, **options)
 
     edges_lables = nx.get_edge_attributes(G, 'weight')
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edges_lables, ax=ax)
