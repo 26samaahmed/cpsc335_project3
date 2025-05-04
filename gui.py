@@ -3,14 +3,14 @@ from tkinter import PhotoImage, messagebox
 import tasks
 from tasks import add_task        # ← updated signature
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import map
+import csuf_map
 
 def update_map(startL, endL):
     # Right side: Map
     right_frame = Frame(content_frame, bg='#C0D9F0')
     right_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20, anchor="n")
 
-    graph = map.draw_map(startL, endL) # Create graph of Buildings with shortest path between two points
+    graph = csuf_map.draw_map(startL, endL) # Create graph of Buildings with shortest path between two points
     canvas = FigureCanvasTkAgg(graph, master=right_frame)
     canvas.draw()
     canvas.get_tk_widget().pack(fill="both", expand=True)
@@ -36,13 +36,33 @@ def submit_task():
     name   = task_name_entry.get()
     startL = start_location_var.get()
     endL   = end_location_var.get()
-    startT = start_time_var_hour.get() + ":" + start_time_var_minute.get() + " " + start_am_vs_pm.get()
-    endT   = end_time_var_hour.get() + ":" + end_time_var_minute.get() + " " + end_am_vs_pm.get()
+    startT = start_time_var_hour.get() + start_time_var_minute.get() + " " + start_am_vs_pm.get()
+    endT   = end_time_var_hour.get() + end_time_var_minute.get() + " " + end_am_vs_pm.get()
 
-    #if endT <= startT:
-       # messagebox.showwarning("Warning", "End time must be after start time.")
-       # end_time_var.set("Select Time")
-       # return False
+    if startT == endT:
+        messagebox.showwarning("Warning", "Start time and end time cannot be the same.")
+        return False
+    if startL == endL:
+        messagebox.showwarning("Warning", "Start location and end location cannot be the same.")
+        return False
+    
+    start_hour, start_minute = map(int, startT.split()[0].split(':')) 
+    end_hour, end_minute = map(int, endT.split()[0].split(':'))
+
+    # Convert 12-hour format to 24-hour format
+    if start_am_vs_pm.get() == "PM" and start_hour != 12:
+        start_hour += 12
+    if end_am_vs_pm.get() == "PM" and end_hour != 12:
+        end_hour += 12
+    if start_am_vs_pm.get() == "AM" and start_hour == 12:
+        start_hour = 0
+    if end_am_vs_pm.get() == "AM" and end_hour == 12:
+        end_hour = 0
+
+    # Check if start time is before end time
+    if (start_hour > end_hour) or (start_hour == end_hour and start_minute >= end_minute):
+        messagebox.showwarning("Warning", "Start time must be before end time.")
+        return False
 
     update_map(startL, endL)
 
@@ -123,7 +143,7 @@ left_frame = Frame(content_frame, bg='#C0D9F0')
 left_frame.pack(side="left", padx=10, pady=10, anchor="n")
 
 # Main frame (Form) inside left_frame
-main_frame = Frame(left_frame, bg='#4E4E4E', borderwidth=5, relief="raised", height=400, width=400)
+main_frame = Frame(left_frame, bg='#4E4E4E', borderwidth=5, relief="raised")
 main_frame.pack(pady=10, fill="both", expand=True)
 
 
@@ -161,41 +181,47 @@ room_number_entry2.grid(row=6, column=1, padx=10, pady=10)
 Label(main_frame, text="Start Time*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w")\
     .grid(row=7, column=0, padx=10, pady=10, sticky="w")
 
+hour_list = ["12:", "01:", "02:", "03:", "04:", "05:", "06:", "07:", "08:", "09:", "10:", "11:"]
+minute_list = ["00", "15", "30", "45"]
+start_time_frame = Frame(main_frame)
+start_time_frame.grid(row=7, column=1, columnspan=3, sticky="w", padx=15)
+
 start_time_var_hour = StringVar(value="Hour")
-start_hour_dropdown = OptionMenu(main_frame, start_time_var_hour, 
-    "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")
-start_hour_dropdown.config(width=4)
-start_hour_dropdown.grid(row=7, column=1)
+start_hour_dropdown = OptionMenu(start_time_frame, start_time_var_hour, *hour_list)
+start_hour_dropdown.config(width=3)
+start_hour_dropdown.pack(side="left", padx=5)
 
 start_time_var_minute = StringVar(value="Minute")
-start_minute_dropdown = OptionMenu(main_frame, start_time_var_minute, "00", "15", "30", "45")
+start_minute_dropdown = OptionMenu(start_time_frame, start_time_var_minute, *minute_list)
 start_minute_dropdown.config(width=4)
-start_minute_dropdown.grid(row=7, column=2, padx=5, pady=10)
+start_minute_dropdown.pack(side="left", padx=5)
 
 start_am_vs_pm = StringVar(value="AM or PM")
-start_am_vs_pm_dropdown = OptionMenu(main_frame, start_am_vs_pm, "AM", "PM")
+start_am_vs_pm_dropdown = OptionMenu(start_time_frame, start_am_vs_pm, "AM", "PM")
 start_am_vs_pm_dropdown.config(width=6)
-start_am_vs_pm_dropdown.grid(row=7, column=3)
+start_am_vs_pm_dropdown.pack(side="left", padx=5)
 
 
 Label(main_frame, text="End Time*", font=("Courier New", 14), bg='#4E4E4E', fg="white", anchor="w")\
     .grid(row=8, column=0, padx=10, pady=10, sticky="w")
 
+end_time_frame = Frame(main_frame)
+end_time_frame.grid(row=8, column=1, columnspan=3, sticky="w", padx=15)
+
 end_time_var_hour = StringVar(value="Hour")
-end_hour_dropdown = OptionMenu(main_frame, end_time_var_hour, 
-    "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")
-end_hour_dropdown.config(width=4)
-end_hour_dropdown.grid(row=8, column=1)
+end_hour_dropdown = OptionMenu(end_time_frame, end_time_var_hour, *hour_list)
+end_hour_dropdown.config(width=3)
+end_hour_dropdown.pack(side="left", padx=5)
 
 end_time_var_minute = StringVar(value="Minute")
-end_minute_dropdown = OptionMenu(main_frame, end_time_var_minute, "00", "15", "30", "45")
+end_minute_dropdown = OptionMenu(end_time_frame, end_time_var_minute, *minute_list)
 end_minute_dropdown.config(width=4)
-end_minute_dropdown.grid(row=8, column=2)
+end_minute_dropdown.pack(side="left", padx=5)
 
 end_am_vs_pm = StringVar(value="AM or PM")
-end_am_vs_pm_dropdown = OptionMenu(main_frame, end_am_vs_pm, "AM", "PM")
+end_am_vs_pm_dropdown = OptionMenu(end_time_frame, end_am_vs_pm, "AM", "PM")
 end_am_vs_pm_dropdown.config(width=6)
-end_am_vs_pm_dropdown.grid(row=8, column=3)
+end_am_vs_pm_dropdown.pack(side="left", padx=5)
 
 
 submit_button = Button(main_frame, text="Submit Task", font=("Courier New", 14), command=submit_task)
@@ -207,6 +233,5 @@ submit_button.grid(row=9, column=0, columnspan=2, pady=20)
 
 root.mainloop()
 
-# TODO: Reformat the way the task is displayed to have the title on a line and then seperate the rest of the information on another line
 # TODO: Fix ovelap
 # TODO: Check if the start time is before the end time
