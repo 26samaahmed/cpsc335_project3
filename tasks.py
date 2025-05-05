@@ -37,7 +37,7 @@ def activity_selection(all_tasks):
     return selected
 
 def add_task(name, start_loc, end_loc, start_tm, end_tm, replace=False):
-    """Add t; on conflict return conflicts.  If replace=True drop conflicts."""
+    """Add a task; on conflict return conflicts. If replace=True, drop conflicts."""
     t = {
         "name": name,
         "start_location": start_loc,
@@ -48,22 +48,22 @@ def add_task(name, start_loc, end_loc, start_tm, end_tm, replace=False):
         "end_dt":   parse_time(end_tm),
     }
 
-    # find tasks that overlap t
+    # find overlapping tasks
     def overlaps(a, b):
         return not (a["end_dt"] <= b["start_dt"] or b["end_dt"] <= a["start_dt"])
 
-    conflicts = [x for x in tasks if overlaps(x, t)]
+    conflicts = [task for task in tasks if overlaps(task, t)]
+
+    # if there are conflicts and user did NOT ask to replace, just report them
     if conflicts and not replace:
-        # report but don't commit
-        return {"scheduled": tasks, "conflicts": conflicts}
+        return {"scheduled": list(tasks), "conflicts": conflicts}
 
-    # if replace, drop conflicting tasks
+    # if replace=True, remove the conflicting tasks from the schedule
     if replace:
-        tasks[:] = [x for x in tasks if x not in conflicts]
+        tasks[:] = [task for task in tasks if task not in conflicts]
 
-    # now add the new task
+    # now add the new task and re-sort
     tasks.append(t)
-    # sort by start time
     tasks[:] = sorted(tasks, key=lambda x: x["start_dt"])
 
-    return {"scheduled": tasks, "conflicts": []}
+    return {"scheduled": list(tasks), "conflicts": []}

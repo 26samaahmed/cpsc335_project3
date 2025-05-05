@@ -16,6 +16,34 @@ def update_map(startL, endL):
     canvas.draw()
     canvas.get_tk_widget().pack(fill="both", expand=True)
 
+def render_tasks(tasks_list):
+    """
+    Clear out any existing task frames (everything in left_frame except main_frame),
+    then render each task in tasks_list as its own Frame.
+    """
+    for w in left_frame.winfo_children():
+        if w is not main_frame:
+            w.destroy()
+
+    for t in tasks_list:
+        tf = Frame(left_frame, bg='#4E4E4E', borderwidth=5, height=100, width=400)
+        tf.pack(pady=10, fill="both", expand=True)
+        tf.pack_propagate(False)
+
+        # Task name
+        Label(tf, text=t["name"], font=("Courier New", 20, "bold"),
+              fg="white", bg="#4E4E4E", justify="left") \
+          .pack(anchor="w", padx=10, pady=(10,0))
+
+        # new: location on one line…
+        Label(tf, text=f"{t['start_location']} - {t['end_location']}",
+              font=("Courier New",14), fg="white", bg="#4E4E4E", anchor="w") \
+          .pack(anchor="w", padx=10, pady=(5,0))
+        # …and time on the next line
+        Label(tf, text=f"{t['start_time']} - {t['end_time']}",
+              font=("Courier New",14), fg="white", bg="#4E4E4E", anchor="w") \
+          .pack(anchor="w", padx=10, pady=(0,10))
+
 def submit_task():
     # Check if all required fields are filled
     if not task_name_entry.get():
@@ -85,32 +113,10 @@ def submit_task():
     else:
         sorted_tasks = result["scheduled"]
 
+    # re‐draw the list from scratch
+    render_tasks(sorted_tasks)
 
     messagebox.showinfo("Success", "Task submitted successfully!")
-
-    # Create New frame with the information
-    task_frame = Frame(left_frame, bg='#4E4E4E', borderwidth=5, height=100, width=400)
-    task_frame.pack(pady=10, fill="both", expand=True)
-    task_frame.pack_propagate(False)
-
-    task_name = Label(task_frame, text=name, font=("Courier New", 20, "bold"), fg="white", bg="#4E4E4E", justify="left")
-    task_name.pack(anchor="w", padx=10, pady=(10, 0))
-
-    info_row = Frame(task_frame, bg="#4E4E4E")
-    info_row.pack(fill="x", expand=True, padx=10, pady=(5, 10))
-
-    locations_label = Label(info_row, 
-        text=f"{startL} - {endL}", 
-        font=("Courier New", 14), 
-        fg="white", bg="#4E4E4E", anchor="w")
-    locations_label.pack(side="left", fill="x", expand=True)
-
-    time_label = Label(info_row, 
-        text=f"{startT} - {endT}", 
-        font=("Courier New", 14), 
-        fg="white", bg="#4E4E4E", anchor="e")
-    time_label.pack(side="right", fill="x")
-
 
     # clear inputs…
     task_name_entry.delete(0, END)
