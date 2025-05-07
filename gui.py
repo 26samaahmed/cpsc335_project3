@@ -69,10 +69,12 @@ def update_map(startL, endL):
         widget.destroy()
 
     # Create new map with the new start and end points
-    graph = csuf_map.draw_map(startL, endL) # Create graph of Buildings with shortest path between two points
+    graph, shortest_path_ani = csuf_map.draw_map(startL, endL) # Create graph of Buildings with shortest path between two points
     canvas = FigureCanvasTkAgg(graph, master=right_frame)
     canvas.draw()
     canvas.get_tk_widget().pack(fill="both", expand=True)
+    
+    shortest_path_ani.event_source.start()
 
 def render_tasks(tasks_list):
     """
@@ -329,9 +331,9 @@ tasks_container.bind("<Configure>", _on_tasks_resize)
 
 # Right side: Map (Show empty map before paths are created)
 right_frame = Frame(content_frame, bg='#C0D9F0')
-right_frame.pack(side="right", fill="both", padx=20, pady=20, anchor="n")
+right_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20, anchor="n")
 
-graph = csuf_map.draw_map() # Create graph of Buildings with shortest path between two points
+graph, shortest_path = csuf_map.draw_map() # Create graph of Buildings with shortest path between two points
 canvas = FigureCanvasTkAgg(graph, master=right_frame)
 canvas.draw()
 canvas.get_tk_widget().pack(fill="both", expand=True)

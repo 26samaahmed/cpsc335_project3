@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from enum import Enum
 import heapq
+from matplotlib.animation import FuncAnimation
 
 class Buildings(Enum):
     ECS = 1
@@ -14,6 +15,7 @@ class Buildings(Enum):
     VA = 7
     H = 8
 
+# Building names that appear in GUI mapped to Buildings Enum
 string_to_enum = {
     "Engineering & Computer Science Building": Buildings.ECS,
     "McCarthy Hall": Buildings.MH,
@@ -25,14 +27,16 @@ string_to_enum = {
     "Humanities Building": Buildings.H
 }
 
-
 def draw_map(start="", end=""):
-    if start != "":
+    if start != "" and end != "":
+        # the start and end points for the paths
         start = string_to_enum[start]
         end = string_to_enum[end]
 
+    # create graph for the nodes and edges
     G = nx.Graph()
 
+    # link the nodes together with weights
     G.add_edge(Buildings.H.value, 15, weight=1)
     G.add_edge(Buildings.MH.value, 15, weight=3)
     G.add_edge(15, 14, weight=7)
@@ -51,7 +55,7 @@ def draw_map(start="", end=""):
     G.add_edge(Buildings.PL.value, 9, weight=2)
     G.add_edge(Buildings.VA.value, Buildings.TSU.value, weight=3)
 
-    # explicitly set positions
+    # set position for all nodes on the graph
     pos = {
         Buildings.ECS.value: (390, 170),
         Buildings.SGMH.value: (370, 400),
@@ -70,67 +74,56 @@ def draw_map(start="", end=""):
         15: (290, 290) # node left of H
     }
 
-    # options = {
-    #     "font_size": 14,
-    #     "node_size": 2000,
-    #     "node_color": "white",
-    #     "edgecolors": "black",
-    #     "linewidths": 2,
-    #     "width": 2,
-    # }
-
-    # labels = {
-    #     1: "ECS",
-    #     2: "SGMH",
-    #     3: "MH",
-    #     4: "TSU",
-    #     5: "KHS",
-    #     6: "PL",
-    #     7: "VA",
-    #     8: "H"
-    # }
-
+    fig, ax = plt.subplots(figsize=(12, 10))
     
-    if start != "":
-        path = dijkstra(G, start.value, end.value)
+    if start != "" and end != "":
+        # find the shortest path
+        path = dijkstra(G, start.value, end.value, pos, ax)
         path_edges = list(zip(path, path[1:]))
 
-    mst = prim(G, len(pos))
-    mst_edges = []
-    for u, v, _ in mst:
-        mst_edges.append((u, v))
+        # find the mst
+        mst = prim(G, len(pos), pos, ax, start)
+        mst_edges = []
+        for u, v, _ in mst:
+            mst_edges.append((u, v))
 
-    if start != "":
-        edge_colors = []
-        for u, v in G.edges():
-            if (u, v) in path_edges or (v, u) in path_edges:
-                edge_colors.append('red')
-            elif (u, v) in mst_edges or (v, u) in mst_edges:
-                edge_colors.append('blue')
-            else:
-                edge_colors.append('green')
-
-    fig, ax = plt.subplots(figsize=(12, 10))
-
+    # draw map image
     img = mpimg.imread("csuf_map.png")
     ax.imshow(img)
 
-    if start != "":
-        nx.draw_networkx(G, pos, with_labels=False, width=3, edge_color=edge_colors, ax=ax)
-    else:
+    # draw over the map with the default nodes and edges if no start and end is given
+    if start == "" and end == "":
         nx.draw_networkx(G, pos, with_labels=False, width=3, edge_color='green', ax=ax)
+        ani = ""
+    else:
+        # combine the mst and shortest path lists
+        edges = mst_edges + path_edges
 
-    # edges_lables = nx.get_edge_attributes(G, 'weight')
-    # nx.draw_networkx_edge_labels(G, pos, edge_labels=edges_lables, ax=ax)
+        # animation for the mst plays first and then the shortest path animation
+        def animation(i):
+            ax.clear()
+            ax.imshow(img)
 
-    # Set margins for the axes so that nodes aren't clipped
+            # draws the nodes
+            nx.draw_networkx_nodes(G, pos, ax=ax, node_color='blue', node_size=500)
+
+            # determines if the mst or shortest path color is used for the animation
+            if i < len(mst_edges):
+                nx.draw_networkx_edges(G, pos, edgelist=edges[:i+1], ax=ax, edge_color='blue', width=3)
+            else:
+                nx.draw_networkx_edges(G, pos, edgelist=mst_edges, ax=ax, edge_color='blue', width=3)
+                nx.draw_networkx_edges(G, pos, edgelist=path_edges[:i + 1 - len(mst_edges)], ax=ax, edge_color='red', width=3)
+
+        # animation variable that will be used in the gui to play the animation
+        ani = FuncAnimation(fig, animation, frames=len(mst_edges) + len(path_edges), interval=500, repeat=False)
+
     ax.set_axis_off()
     ax.margins(0.20)
 
-    return fig
+    return fig, ani
 
-
-def dijkstra(graph, start, end):
+# finds shortest path
+def dijkstra(graph, start, end, pos, ax):
     dist = {}
     prev = {}
 
@@ -163,9 +156,10 @@ def dijkstra(graph, start, end):
     path.reverse()
     return path
 
-def prim(graph, n):
+# mst
+def prim(graph, n, pos, ax, start):
     visited = [False] * (n + 1)
-    min_heap = [(0, 1, -1)]
+    min_heap = [(0, start.value, -1)]
     mst_edges = []
 
     while min_heap:
