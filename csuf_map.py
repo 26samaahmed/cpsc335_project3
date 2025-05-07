@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 from enum import Enum
 import heapq
 
@@ -24,6 +25,7 @@ string_to_enum = {
     "Humanities Building": Buildings.H
 }
 
+
 def draw_map(start="", end=""):
     if start != "":
         start = string_to_enum[start]
@@ -31,58 +33,69 @@ def draw_map(start="", end=""):
 
     G = nx.Graph()
 
-    G.add_edge(Buildings.H.value, Buildings.SGMH.value, weight=4)
-    G.add_edge(Buildings.H.value, Buildings.ECS.value, weight=5)
-    G.add_edge(Buildings.ECS.value, Buildings.MH.value, weight=7)
-    G.add_edge(Buildings.ECS.value, Buildings.KHS.value, weight=12)
+    G.add_edge(Buildings.H.value, 15, weight=1)
+    G.add_edge(Buildings.MH.value, 15, weight=3)
+    G.add_edge(15, 14, weight=7)
+    G.add_edge(Buildings.ECS.value, 14, weight=4)
+    G.add_edge(14, 9, weight=3)
+    G.add_edge(Buildings.KHS.value, 9, weight=1)
+    G.add_edge(9, 10, weight=5)
+    G.add_edge(Buildings.PL.value, 14, weight=2)
+    G.add_edge(Buildings.TSU.value, 10, weight=1)
+    G.add_edge(Buildings.VA.value, 13, weight=3)
+    G.add_edge(Buildings.MH.value, 13, weight=5)
+    G.add_edge(Buildings.SGMH.value, 15, weight=7)
+    G.add_edge(Buildings.MH.value, 9, weight=9)
     G.add_edge(Buildings.SGMH.value, Buildings.MH.value, weight=5)
-    G.add_edge(Buildings.MH.value, Buildings.TSU.value, weight=4)
-    G.add_edge(Buildings.TSU.value, Buildings.KHS.value, weight=6)
-    G.add_edge(Buildings.SGMH.value, Buildings.TSU.value, weight=11)
-    G.add_edge(Buildings.KHS.value, Buildings.MH.value, weight=4)
-    G.add_edge(Buildings.PL.value, Buildings.ECS.value, weight=2)
-    G.add_edge(Buildings.PL.value, Buildings.MH.value, weight=1)
-    G.add_edge(Buildings.PL.value, Buildings.KHS.value, weight=4)
+    G.add_edge(Buildings.PL.value, Buildings.MH.value, weight=5)
+    G.add_edge(Buildings.PL.value, 9, weight=2)
     G.add_edge(Buildings.VA.value, Buildings.TSU.value, weight=3)
-    G.add_edge(Buildings.VA.value, Buildings.SGMH.value, weight=6)
 
     # explicitly set positions
     pos = {
-        Buildings.ECS.value: (0, -0.03),
-        Buildings.SGMH.value: (-1, 0.3),
-        Buildings.MH.value: (2, 0.17),
-        Buildings.PL.value: (2, 0.03),
-        Buildings.TSU.value: (4, 0.255),
-        Buildings.KHS.value: (5, 0),
-        Buildings.VA.value: (2, 0.32),
-        Buildings.H.value: (0.3, 0.16)
+        Buildings.ECS.value: (390, 170),
+        Buildings.SGMH.value: (370, 400),
+        Buildings.MH.value: (250, 340),
+        Buildings.PL.value: (260, 215),
+        Buildings.TSU.value: (110, 210),
+        Buildings.KHS.value: (230, 120),
+        Buildings.VA.value: (110, 270),
+        Buildings.H.value: (330, 290),
+        9: (230, 170), # node below KHS
+        10: (110, 170), # node above TSU
+        11: (260, 170), # node above PL
+        12: (240, 30), # node above MH
+        13: (150, 340), # node below VA
+        14: (290, 170), # node between PL and ECS
+        15: (290, 290) # node left of H
     }
 
-    options = {
-        "font_size": 14,
-        "node_size": 2000,
-        "node_color": "white",
-        "edgecolors": "black",
-        "linewidths": 2,
-        "width": 2,
-    }
+    # options = {
+    #     "font_size": 14,
+    #     "node_size": 2000,
+    #     "node_color": "white",
+    #     "edgecolors": "black",
+    #     "linewidths": 2,
+    #     "width": 2,
+    # }
 
-    labels = {
-        1: "ECS",
-        2: "SGMH",
-        3: "MH",
-        4: "TSU",
-        5: "KHS",
-        6: "PL",
-        7: "VA",
-        8: "H"
-    }
+    # labels = {
+    #     1: "ECS",
+    #     2: "SGMH",
+    #     3: "MH",
+    #     4: "TSU",
+    #     5: "KHS",
+    #     6: "PL",
+    #     7: "VA",
+    #     8: "H"
+    # }
+
     
     if start != "":
         path = dijkstra(G, start.value, end.value)
         path_edges = list(zip(path, path[1:]))
 
-    mst = prim(G, len(Buildings))
+    mst = prim(G, len(pos))
     mst_edges = []
     for u, v, _ in mst:
         mst_edges.append((u, v))
@@ -95,22 +108,27 @@ def draw_map(start="", end=""):
             elif (u, v) in mst_edges or (v, u) in mst_edges:
                 edge_colors.append('blue')
             else:
-                edge_colors.append('black')
+                edge_colors.append('green')
 
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(12, 10))
+
+    img = mpimg.imread("csuf_map.png")
+    ax.imshow(img)
+
     if start != "":
-        nx.draw_networkx(G, pos, labels=labels, edge_color=edge_colors, ax=ax, **options)
+        nx.draw_networkx(G, pos, with_labels=False, width=3, edge_color=edge_colors, ax=ax)
     else:
-        nx.draw_networkx(G, pos, labels=labels, ax=ax, **options)
+        nx.draw_networkx(G, pos, with_labels=False, width=3, edge_color='green', ax=ax)
 
-    edges_lables = nx.get_edge_attributes(G, 'weight')
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edges_lables, ax=ax)
+    # edges_lables = nx.get_edge_attributes(G, 'weight')
+    # nx.draw_networkx_edge_labels(G, pos, edge_labels=edges_lables, ax=ax)
 
     # Set margins for the axes so that nodes aren't clipped
     ax.set_axis_off()
     ax.margins(0.20)
 
     return fig
+
 
 def dijkstra(graph, start, end):
     dist = {}
