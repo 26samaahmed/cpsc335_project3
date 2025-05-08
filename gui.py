@@ -333,10 +333,20 @@ tasks_container.bind("<Configure>", _on_tasks_resize)
 right_frame = Frame(content_frame, bg='#C0D9F0')
 right_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20, anchor="n")
 
+legend = Label(right_frame, text="Minimum Spanning Tree: Blue", font=("Courier New", 20), bg='#ffffff', fg="blue", anchor="w")
+legend.pack(padx=10, pady=10, anchor="w")
+
+legend = Label(right_frame, text="Shortest Path: Red", font=("Courier New", 20), bg='#ffffff', fg="red", anchor="w")
+legend.pack(padx=10, pady=10, anchor="w")
+
+legend = Label(right_frame, text="All Edges: Green", font=("Courier New", 20), bg='#ffffff', fg="green", anchor="w")
+legend.pack(padx=10, pady=10, anchor="w")
+
 graph, shortest_path = csuf_map.draw_map() # Create graph of Buildings with shortest path between two points
 canvas = FigureCanvasTkAgg(graph, master=right_frame)
 canvas.draw()
 canvas.get_tk_widget().pack(fill="both", expand=True)
+
 
 root.mainloop()
 
