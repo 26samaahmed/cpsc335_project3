@@ -28,7 +28,8 @@ def _merge(left, right, key):
 
 def activity_selection(all_tasks):
     """Greedy activity selection by earliest end time."""
-    sorted_by_end = sorted(all_tasks, key=lambda t: parse_time(t["end_time"]))
+    # use your merge_sort here
+    sorted_by_end = merge_sort(all_tasks, key=lambda t: parse_time(t["end_time"]))
     selected, last_end = [], None
     for t in sorted_by_end:
         if last_end is None or parse_time(t["start_time"]) >= last_end:
@@ -64,6 +65,7 @@ def add_task(name, start_loc, end_loc, start_tm, end_tm, replace=False):
 
     # now add the new task and re-sort
     tasks.append(t)
-    tasks[:] = sorted(tasks, key=lambda x: x["start_dt"])
-
+    # now sort via merge_sort (professor’s requirement)
+    tasks[:] = merge_sort(tasks, key=lambda x: x["start_dt"])
+    
     return {"scheduled": list(tasks), "conflicts": []}
